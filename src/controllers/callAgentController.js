@@ -6,8 +6,20 @@ const handleCallAgent = async (req, res) => {
         const { prompt } = req.body;
         console.log("Received prompt:", prompt);
 
+        if (!req.session.chatHistory) {
+            req.session.chatHistory = [];
+        }
+
+        req.session.chatHistory.push({ 
+            "role" : "user",
+            "content": prompt 
+        });
+
+        console.log("The chat history is as: " + JSON.stringify(req.session.chatHistory, null, 2));
+
+
         // Step 1: Get the audio stream from the CallAgent service
-        const audioStream = await callAgentService.handleCallAgent(prompt);
+        const audioStream = await callAgentService.handleCallAgent(prompt, req.session.chatHistory);
 
         // Step 2: Stream the audio response to the client
         console.log("Streaming audio to client...");
